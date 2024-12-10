@@ -53,11 +53,13 @@ function gls_shipping_method_init()
 			 */
 			public function init_form_fields()
 			{
+				$weight_unit = get_option('woocommerce_weight_unit');
+
 				$this->form_fields = array(
 					'enabled' => array(
 						'title' => __('Enable', 'gls-shipping-for-woocommerce'),
 						'type' => 'checkbox',
-						'description' => __('Enable this shipping.', 'gls-shipping-for-woocommerce'),
+						'description' => __('Enable this shipping globally.', 'gls-shipping-for-woocommerce'),
 						'default' => 'yes'
 					),
 					'title' => array(
@@ -72,6 +74,26 @@ function gls_shipping_method_init()
 						'description' => __('Enter the shipping price for this method.', 'gls-shipping-for-woocommerce'),
 						'default'     => 0,
 						'desc_tip'    => true,
+					),
+					'weight_based_rates' => array(
+						'title'       => __('Weight Based Rates: max_weight|cost', 'gls-shipping-for-woocommerce'),
+						'type'        => 'textarea',
+						'description' => sprintf(__('Optional: Enter weight based rates (one per line). Format: max_weight|cost. Example: 1|100 means up to 1 %s costs 100. Leave empty to use default price.', 'gls-shipping-for-woocommerce'), $weight_unit),
+						'default'     => '',
+						'placeholder' => 'max_weight|cost
+max_weight|cost',
+						'css'         => 'width:300px; height: 150px;',
+					),
+					'free_shipping_threshold' => array(
+						'title'       => __('Free Shipping Threshold', 'gls-shipping-for-woocommerce'),
+						'type'        => 'number',
+						'description' => __('Cart total amount above which shipping will be free. Set to 0 to disable.', 'gls-shipping-for-woocommerce'),
+						'default'     => '0',
+						'desc_tip'    => true,
+						'custom_attributes' => array(
+							'min'  => '0',
+							'step' => '0.01'
+						)
 					),
 					'supported_countries' => array(
 						'title'   => __('Supported Countries', 'gls-shipping-for-woocommerce'),
@@ -288,14 +310,60 @@ function gls_shipping_method_init()
 			 */
 			public function calculate_shipping($package = array())
 			{
-				$supported_countries = $this->get_option('supported_countries');
-				$price = $this->get_option('shipping_price', '0');
+				$supported_countries = $this->get_option('supported_countries', []);
+				$weight_based_rates_raw = $this->get_option('weight_based_rates', '');
+				$default_price = $this->get_option('shipping_price', '0');
+				$free_shipping_threshold = $this->get_option('free_shipping_threshold', '0');
 
 				if (in_array($package['destination']['country'], $supported_countries)) {
+					
+					$cart_total = WC()->cart->get_subtotal() - WC()->cart->get_discount_total();
+					$shipping_price = $default_price;
+
+					if ($free_shipping_threshold > 0 && $cart_total >= $free_shipping_threshold) {
+						$shipping_price = 0;
+					// Check if weight-based rates are set and valid
+					} else if (!empty(trim($weight_based_rates_raw))) {
+						$weight_based_rates = array();
+						$lines = explode("\n", $weight_based_rates_raw);
+						foreach ($lines as $line) {
+							$rate = explode('|', trim($line));
+							$weight = str_replace(',', '.', $rate[0]);
+							$price = str_replace(',', '.', $rate[1]);
+							if (count($rate) == 2 && is_numeric($weight) && is_numeric($price)) {
+								$weight_based_rates[] = array(
+									'weight' => floatval($weight),
+									'price' => floatval($price)
+								);
+							}
+						}
+
+						// If we have valid weight-based rates, use them
+						if (!empty($weight_based_rates)) {
+							$cart_weight = WC()->cart->get_cart_contents_weight();
+							// Sort rates by weight in ascending order
+							usort($weight_based_rates, function($a, $b) {
+								return $a['weight'] <=> $b['weight'];
+							});
+							// Find the appropriate rate based on cart weight
+							foreach ($weight_based_rates as $rate) {
+								if ($cart_weight <= $rate['weight']) {
+									$shipping_price = $rate['price'];
+									break;
+								}
+							}
+
+							// If no matching rate found, use the highest rate
+							if ($shipping_price === $default_price && !empty($weight_based_rates)) {
+								$shipping_price = end($weight_based_rates)['price'];
+							}
+						}
+					}
+
 					$rate = array(
 						'id'       => $this->id,
 						'label'    => $this->title,
-						'cost'     => $price,
+						'cost'     => str_replace(',', '.', $shipping_price),
 						'calc_tax' => 'per_order'
 					);
 
@@ -303,6 +371,7 @@ function gls_shipping_method_init()
 					$this->add_rate($rate);
 				}
 			}
+			
 		}
 	}
 }

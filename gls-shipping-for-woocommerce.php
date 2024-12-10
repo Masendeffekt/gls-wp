@@ -3,7 +3,7 @@
 /**
  * Plugin Name: GLS Shipping for WooCommerce
  * Description: Offical GLS Shipping for WooCommerce plugin
- * Version: 1.1.4
+ * Version: 1.2.0
  * Author: Inchoo
  * License: GPLv2
  * License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -11,7 +11,7 @@
  * Text Domain: gls-shipping-for-woocommerce
  * Domain Path: /languages
  * Requires at least: 5.9
- * Tested up to: 6.6
+ * Tested up to: 6.7
  * Requires PHP: 7.1
  *
  * WC requires at least: 4.3
@@ -24,7 +24,7 @@ final class GLS_Shipping_For_Woo
 {
     private static $instance;
 
-    private $version = '1.1.4';
+    private $version = '1.2.0';
 
     private function __construct()
     {
@@ -43,14 +43,18 @@ final class GLS_Shipping_For_Woo
 
         if (is_admin()) {
             require_once(GLS_SHIPPING_ABSPATH . 'includes/admin/class-gls-shipping-order.php');
+            require_once(GLS_SHIPPING_ABSPATH . 'includes/admin/class-gls-shipping-bulk.php');
             require_once(GLS_SHIPPING_ABSPATH . 'includes/api/class-gls-shipping-api-data.php');
             require_once(GLS_SHIPPING_ABSPATH . 'includes/api/class-gls-shipping-api-service.php');
         }
 
         if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
             require_once(GLS_SHIPPING_ABSPATH . 'includes/methods/class-gls-shipping-method.php');
+            require_once(GLS_SHIPPING_ABSPATH . 'includes/methods/class-gls-shipping-method-zones.php');
             require_once(GLS_SHIPPING_ABSPATH . 'includes/methods/class-gls-shipping-method-parcel-shop.php');
+            require_once(GLS_SHIPPING_ABSPATH . 'includes/methods/class-gls-shipping-method-parcel-shop-zones.php');
             require_once(GLS_SHIPPING_ABSPATH . 'includes/methods/class-gls-shipping-method-parcel-locker.php');
+            require_once(GLS_SHIPPING_ABSPATH . 'includes/methods/class-gls-shipping-method-parcel-locker-zones.php');
         }
     }
     /**
@@ -64,8 +68,12 @@ final class GLS_Shipping_For_Woo
         $this->define('GLS_SHIPPING_VERSION', $this->get_version());
 
         $this->define('GLS_SHIPPING_METHOD_ID', 'gls_shipping_method');
+        $this->define('GLS_SHIPPING_METHOD_ZONES_ID', 'gls_shipping_method_zones');
         $this->define('GLS_SHIPPING_METHOD_PARCEL_LOCKER_ID', 'gls_shipping_method_parcel_locker');
         $this->define('GLS_SHIPPING_METHOD_PARCEL_SHOP_ID', 'gls_shipping_method_parcel_shop');
+
+        $this->define('GLS_SHIPPING_METHOD_PARCEL_LOCKER_ZONES_ID', 'gls_shipping_method_parcel_locker_zones');
+        $this->define('GLS_SHIPPING_METHOD_PARCEL_SHOP_ZONES_ID', 'gls_shipping_method_parcel_shop_zones');
     }
 
     /**
@@ -116,8 +124,11 @@ final class GLS_Shipping_For_Woo
     public function add_gls_shipping_methods($methods)
     {
         $methods[GLS_SHIPPING_METHOD_ID] = 'GLS_Shipping_Method';
+        $methods[GLS_SHIPPING_METHOD_ZONES_ID] = 'GLS_Shipping_Method_Zones';
         $methods[GLS_SHIPPING_METHOD_PARCEL_LOCKER_ID] = 'GLS_Shipping_Method_Parcel_Shop';
         $methods[GLS_SHIPPING_METHOD_PARCEL_SHOP_ID] = 'GLS_Shipping_Method_Parcel_Locker';
+        $methods[GLS_SHIPPING_METHOD_PARCEL_LOCKER_ZONES_ID] = 'GLS_Shipping_Method_Parcel_Locker_Zones';
+        $methods[GLS_SHIPPING_METHOD_PARCEL_SHOP_ZONES_ID] = 'GLS_Shipping_Method_Parcel_Shop_Zones';
 
         return $methods;
     }
