@@ -77,12 +77,28 @@
 			}
 		});
 
+		function clearGLSPickupInfo() {
+			var glsPickupInfo = document.getElementById("gls-pickup-info");
+			var glsPickupInfoData = document.getElementById(
+				"gls-pickup-info-data"
+			);
+
+			if (glsPickupInfo) {
+				glsPickupInfo.innerHTML = "";
+				glsPickupInfo.style.display = "none";
+			}
+			if (glsPickupInfoData) {
+				glsPickupInfoData.value = "";
+			}
+		}
+
 		function updateCheckout() {
 			var selectedShippingMethod = document.querySelector(
 				'input[name="shipping_method[0]"]:checked'
 			);
 			var glsMap = document.getElementById("gls-map");
-			var glsPickupInfo = document.getElementById("gls-pickup-info");
+
+			clearGLSPickupInfo();
 
 			if (selectedShippingMethod) {
 				switch (selectedShippingMethod.value) {
@@ -92,14 +108,16 @@
 					case "gls_shipping_method_parcel_shop":
 						glsMap.setAttribute("filter-type", "parcel-shop");
 						break;
-					default:
-						if (glsPickupInfo) {
-							glsPickupInfo.style.display = "none";
-						}
-						break;
 				}
 			}
 		}
+
+		// Event listener for shipping method change
+		document.body.addEventListener("change", function (event) {
+			if (event.target.name === "shipping_method[0]") {
+				updateCheckout();
+			}
+		});
 
 		document.body.addEventListener("updated_checkout", updateCheckout);
 	});
