@@ -46,6 +46,7 @@ final class GLS_Shipping_For_Woo
             require_once(GLS_SHIPPING_ABSPATH . 'includes/admin/class-gls-shipping-bulk.php');
             require_once(GLS_SHIPPING_ABSPATH . 'includes/api/class-gls-shipping-api-data.php');
             require_once(GLS_SHIPPING_ABSPATH . 'includes/api/class-gls-shipping-api-service.php');
+            require_once(GLS_SHIPPING_ABSPATH . 'includes/admin/class-gls-label-archive.php');
         }
 
         if (in_array('woocommerce/woocommerce.php', apply_filters('active_plugins', get_option('active_plugins')))) {
@@ -167,3 +168,4 @@ add_action(
 );
 
 GLS_Shipping_For_Woo::get_instance();
+

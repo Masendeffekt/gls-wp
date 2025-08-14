@@ -22,12 +22,9 @@ class GLS_Shipping_My_Account
     private function display_gls_pickup_info($order_id)
     {
         $order = wc_get_order($order_id);
-
-        // Return early if order is false (e.g., during email previews)
-        if (!$order) {
-            return '';
+        if ( ! $order || ! is_object( $order ) ) {
+          return;
         }
-
         $gls_pickup_info = $order->get_meta('_gls_pickup_info', true);
         $tracking_code   = $order->get_meta('_gls_tracking_code', true);
 
