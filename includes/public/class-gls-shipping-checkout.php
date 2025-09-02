@@ -80,18 +80,36 @@ class GLS_Shipping_Checkout
     }
 
     /**
-     * Add a GLS button to the shipping method label.
+     * Add additional UI elements to the shipping method label.
      *
-     * Appends a button to select GLS Parcel after the shipping method label if a GLS shipping method is chosen.
+     * Prepends a GLS icon (filterable) and appends a button to select a GLS
+     * Parcel location after the shipping method label if a GLS shipping method
+     * is chosen.
      *
-     * @param string $label The shipping method label.
+     * @param string           $label  The shipping method label.
      * @param WC_Shipping_Rate $method The shipping method object.
-     * @return string Modified label with or without the GLS button.
+     * @return string Modified label with or without the GLS button and icon.
      */
     public function add_gls_button_to_shipping_method($label, $method)
     {
         if (is_cart()) {
             return $label;
+        }
+
+        /**
+         * Filter the URL of the GLS shipping method icon.
+         *
+         * This allows store owners to change the icon for a specific GLS
+         * shipping method without modifying plugin files.
+         *
+         * @param string $url       Default icon URL. Empty by default.
+         * @param string $method_id Shipping method ID.
+         */
+        $icon_url = apply_filters('gls_shipping_method_icon_url', '', $method->id);
+
+        if (!empty($icon_url)) {
+            $icon = '<img src="' . esc_url($icon_url) . '" alt="" class="gls-shipping-method-icon" style="height:1em;width:auto;margin-right:4px;vertical-align:middle;" />';
+            $label = $icon . $label;
         }
 
         $chosen_methods = WC()->session->get('chosen_shipping_methods');
