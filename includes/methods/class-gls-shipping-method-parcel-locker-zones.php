@@ -22,10 +22,12 @@ function gls_shipping_method_parcel_locker_zones_init()
 
 				$this->supports = array('shipping-zones', 'instance-settings', 'instance-settings-modal');
 
-				$this->init();
+                                $this->init();
 
-				$this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
-				$this->title = isset($this->instance_settings['title']) ? $this->instance_settings['title'] : __('Delivery to GLC Parcel Locker', 'gls-shipping-for-woocommerce');
+                                $this->enabled  = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
+                                $this->title    = isset($this->instance_settings['title']) ? $this->instance_settings['title'] : __('Delivery to GLC Parcel Locker', 'gls-shipping-for-woocommerce');
+                                $this->icon_url = isset($this->instance_settings['icon_url']) ? esc_url_raw($this->instance_settings['icon_url']) : '';
+                                $this->settings['icon_url'] = $this->icon_url;
 			}
 
 			/**
@@ -48,12 +50,20 @@ function gls_shipping_method_parcel_locker_zones_init()
 				$weight_unit = get_option('woocommerce_weight_unit');
 
 				$this->instance_form_fields = array(
-					'title' => array(
-						'title' => __('Title', 'gls-shipping-for-woocommerce'),
-						'type' => 'text',
-						'description' => __('Title to be displayed on site', 'gls-shipping-for-woocommerce'),
-						'default' => __('Delivery to GLS Parcel Locker', 'gls-shipping-for-woocommerce')
-					),
+                                        'title' => array(
+                                                'title' => __('Title', 'gls-shipping-for-woocommerce'),
+                                                'type' => 'text',
+                                                'description' => __('Title to be displayed on site', 'gls-shipping-for-woocommerce'),
+                                                'default' => __('Delivery to GLS Parcel Locker', 'gls-shipping-for-woocommerce')
+                                        ),
+                                        'icon_url' => array(
+                                                'title'       => __('Icon', 'gls-shipping-for-woocommerce'),
+                                                'type'        => 'text',
+                                                'description' => __('Image appears after the shipping name on cart and checkout pages.', 'gls-shipping-for-woocommerce'),
+                                                'default'     => '',
+                                                'desc_tip'    => true,
+                                                'sanitize_callback' => 'esc_url_raw',
+                                        ),
 					'shipping_price' => array(
 						'title'       => __('Shipping Price', 'gls-shipping-for-woocommerce'),
 						'type'        => 'text',

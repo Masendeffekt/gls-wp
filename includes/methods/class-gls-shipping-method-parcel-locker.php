@@ -18,10 +18,12 @@ function gls_shipping_method_parcel_locker_init()
 				$this->method_title       = __('GLS Parcel Locker', 'gls-shipping-for-woocommerce');
 				$this->method_description = __('Parcel Shop Delivery (PSD) service that ships parcels to the GLS Locker. GLS Parcel Locker can be selected from the interactive GLS Parcel Shop and GLS Locker finder map.', 'gls-shipping-for-woocommerce');
 
-				$this->init();
+                                $this->init();
 
-				$this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
-				$this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Delivery to GLC Parcel Locker', 'gls-shipping-for-woocommerce');
+                                $this->enabled   = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
+                                $this->title     = isset($this->settings['title']) ? $this->settings['title'] : __('Delivery to GLC Parcel Locker', 'gls-shipping-for-woocommerce');
+                                $this->icon_url  = isset($this->settings['icon_url']) ? esc_url_raw($this->settings['icon_url']) : '';
+                                $this->settings['icon_url'] = $this->icon_url;
 			}
 
 			/**
@@ -50,12 +52,20 @@ function gls_shipping_method_parcel_locker_init()
 						'description' => __('Enable this shipping globally.', 'gls-shipping-for-woocommerce'),
 						'default' => 'yes'
 					),
-					'title' => array(
-						'title' => __('Title', 'gls-shipping-for-woocommerce'),
-						'type' => 'text',
-						'description' => __('Title to be display on site', 'gls-shipping-for-woocommerce'),
-						'default' => __('Delivery to GLS Parcel Locker', 'gls-shipping-for-woocommerce')
-					),
+                                        'title' => array(
+                                                'title' => __('Title', 'gls-shipping-for-woocommerce'),
+                                                'type' => 'text',
+                                                'description' => __('Title to be display on site', 'gls-shipping-for-woocommerce'),
+                                                'default' => __('Delivery to GLS Parcel Locker', 'gls-shipping-for-woocommerce')
+                                        ),
+                                        'icon_url' => array(
+                                                'title'       => __('Icon', 'gls-shipping-for-woocommerce'),
+                                                'type'        => 'text',
+                                                'description' => __('Image appears after the shipping name on cart and checkout pages.', 'gls-shipping-for-woocommerce'),
+                                                'default'     => '',
+                                                'desc_tip'    => true,
+                                                'sanitize_callback' => 'esc_url_raw',
+                                        ),
 					'shipping_price' => array(
 						'title'       => __('Shipping Price', 'gls-shipping-for-woocommerce'),
 						'type'        => 'text',
