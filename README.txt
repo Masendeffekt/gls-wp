@@ -57,6 +57,23 @@ To install and configure this plugin:
 2. Navigate to WooCommerce Settings > Shipping and select GLS Shipping.
 3. Enter your GLS API credentials and configure the necessary settings to enable the shipping and tracking functionalities.
 
+== Filters ==
+
+= gls_shipping_method_icon_url =
+
+Allows customization of the icon displayed next to GLS shipping methods on the checkout page.
+
+```
+add_filter('gls_shipping_method_icon_url', function ($url, $method_id) {
+    if ('gls_shipping_method_parcel_locker' === $method_id) {
+        return 'https://example.com/path/to/custom-icon.svg';
+    }
+    return $url;
+}, 10, 2);
+```
+
+The filter receives the default icon URL (empty by default) and the shipping method ID.
+
 == Frequently Asked Questions ==
 
 == Screenshots ==
