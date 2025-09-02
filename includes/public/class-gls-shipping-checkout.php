@@ -3,8 +3,7 @@
 /**
  * Handle frontend scripts for GLS Shipping Checkout.
  *
- * This class handles adding a GLS button to the shipping method selection
- * and saving GLS Parcel Shop info as order meta data.
+ * This class handles decorating shipping method labels and saving GLS Parcel Shop info as order meta data.
  *
  * @since     1.0.0
  */
@@ -41,7 +40,7 @@ class GLS_Shipping_Checkout
             GLS_SHIPPING_METHOD_PARCEL_SHOP_ZONES_ID
         );
 
-        add_filter('woocommerce_cart_shipping_method_full_label', array($this, 'add_gls_button_to_shipping_method'), 10, 2);
+        add_filter('woocommerce_cart_shipping_method_full_label', array($this, 'decorate_shipping_label'), 10, 2);
         add_action('woocommerce_checkout_update_order_meta', array($this, 'save_gls_parcel_shop_info'));
         add_action('woocommerce_review_order_after_shipping', array($this, 'display_pickup_information'));
         add_action('woocommerce_checkout_process', array($this, 'validate_gls_parcel_shop_selection'));
@@ -80,16 +79,21 @@ class GLS_Shipping_Checkout
     }
 
     /**
-     * Add a GLS button to the shipping method label.
+     * Decorate the shipping method label.
      *
-     * Appends a button to select GLS Parcel after the shipping method label if a GLS shipping method is chosen.
+     * Appends an optional icon and, for supported GLS methods, a button to select a parcel locker/shop.
      *
-     * @param string $label The shipping method label.
+     * @param string $label  The shipping method label.
      * @param WC_Shipping_Rate $method The shipping method object.
-     * @return string Modified label with or without the GLS button.
+     * @return string Modified label with optional icon and GLS button.
      */
-    public function add_gls_button_to_shipping_method($label, $method)
+    public function decorate_shipping_label($label, $method)
     {
+        $icon_url = apply_filters('gls_shipping_method_icon_url', '', $method->get_method_id());
+        if (!empty($icon_url)) {
+            $label .= ' <img src="' . esc_url($icon_url) . '" alt="" />';
+        }
+
         if (is_cart()) {
             return $label;
         }
