@@ -20,10 +20,12 @@ function gls_shipping_method_init()
 				$this->method_title       = __('GLS Delivery to Address', 'gls-shipping-for-woocommerce');
 				$this->method_description = __('Parcels are shipped to the customer’s address.', 'gls-shipping-for-woocommerce');
 
-				$this->init();
+                                $this->init();
 
-				$this->enabled = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
-				$this->title = isset($this->settings['title']) ? $this->settings['title'] : __('Delivery to Address', 'gls-shipping-for-woocommerce');
+                                $this->enabled   = isset($this->settings['enabled']) ? $this->settings['enabled'] : 'yes';
+                                $this->title     = isset($this->settings['title']) ? $this->settings['title'] : __('Delivery to Address', 'gls-shipping-for-woocommerce');
+                                $this->icon_url  = isset($this->settings['icon_url']) ? esc_url_raw($this->settings['icon_url']) : '';
+                                $this->settings['icon_url'] = $this->icon_url;
 			}
 
 			/**
@@ -62,12 +64,20 @@ function gls_shipping_method_init()
 						'description' => __('Enable this shipping globally.', 'gls-shipping-for-woocommerce'),
 						'default' => 'yes'
 					),
-					'title' => array(
-						'title' => __('Title', 'gls-shipping-for-woocommerce'),
-						'type' => 'text',
-						'description' => __('Title to be display on site', 'gls-shipping-for-woocommerce'),
-						'default' => __('Delivery to Address', 'gls-shipping-for-woocommerce')
-					),
+                                        'title' => array(
+                                                'title' => __('Title', 'gls-shipping-for-woocommerce'),
+                                                'type' => 'text',
+                                                'description' => __('Title to be display on site', 'gls-shipping-for-woocommerce'),
+                                                'default' => __('Delivery to Address', 'gls-shipping-for-woocommerce')
+                                        ),
+                                        'icon_url' => array(
+                                                'title'       => __('Icon', 'gls-shipping-for-woocommerce'),
+                                                'type'        => 'text',
+                                                'description' => __('Image appears after the shipping name on cart and checkout pages.', 'gls-shipping-for-woocommerce'),
+                                                'default'     => '',
+                                                'desc_tip'    => true,
+                                                'sanitize_callback' => 'esc_url_raw',
+                                        ),
 					'shipping_price' => array(
 						'title'       => __('Shipping Price', 'gls-shipping-for-woocommerce'),
 						'type'        => 'text',
