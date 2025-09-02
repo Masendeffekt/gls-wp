@@ -90,14 +90,11 @@ class GLS_Shipping_Checkout
   
     public function decorate_shipping_label($label, $method)
     {
-        $icon_url = apply_filters('gls_shipping_method_icon_url', '', $method->get_method_id());
-        if (!empty($icon_url)) {
-            $label .= ' <img src="' . esc_url($icon_url) . '" alt="" />';
-        }
-
-        if (is_cart()) {
-            return $label;
-        }
+        $settings = get_option(
+            'woocommerce_' . $method->get_method_id() . '_' . $method->instance_id . '_settings',
+            []
+        );
+        $icon_url = isset($settings['icon_url']) ? $settings['icon_url'] : '';
 
         /**
          * Filter the URL of the GLS shipping method icon.
@@ -108,7 +105,14 @@ class GLS_Shipping_Checkout
          * @param string $url       Default icon URL. Empty by default.
          * @param string $method_id Shipping method ID.
          */
-        $icon_url = apply_filters('gls_shipping_method_icon_url', '', $method->id);
+        $icon_url = apply_filters('gls_shipping_method_icon_url', $icon_url, $method->get_method_id());
+
+        if (is_cart()) {
+            if (!empty($icon_url)) {
+                $label .= ' <img src="' . esc_url($icon_url) . '" alt="" />';
+            }
+            return $label;
+        }
 
         if (!empty($icon_url)) {
             $icon = '<img src="' . esc_url($icon_url) . '" alt="" class="gls-shipping-method-icon" style="height:1em;width:auto;margin-right:4px;vertical-align:middle;" />';
